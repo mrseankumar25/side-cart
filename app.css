@@ -1,0 +1,352 @@
+.drawer-open,
+.drawer-open body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.drawerContainer {
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 26;
+}
+
+.drawer-open .drawerContainer {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.drawerContainer::before {
+  bottom: 0;
+  background-color: #e6e6e6;
+  content: "";
+  display: block;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 0;
+}
+
+.drawer-open .drawerContainer::before {
+  animation: overlay-on 0.35s forwards;
+}
+
+.drawer-closing .drawerContainer::before {
+  animation: overlay-off 0.25s forwards;
+}
+
+.drawerWrapper {
+  animation-duration: 0ms;
+  position: relative;
+  transform: translateX(100%);
+}
+
+.drawer-open .drawerWrapper {
+  animation: drawer-on 0.45s forwards;
+  transform: translateX(0%);
+}
+
+.drawer-closing .drawerWrapper {
+  animation: drawer-off 0.45s forwards;
+}
+
+.drawerBody {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+}
+
+.drawerBody>form {
+  /* flex: 1 1 auto; */
+}
+
+.drawerWrapper {
+  background-color: #F5F4F1;
+  margin-left: auto;
+  max-width: 450px;
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}
+
+.drawerBody .content {
+  padding: 0 !important;
+}
+
+.drawerBody h2 {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 30px;
+  position: sticky;
+  top: 0;
+}
+
+.shippingbar {
+  text-align: center;
+  background-color: #73899B;
+  color: #fff;
+
+  font-weight: 800;
+  font-size: 16px;
+  padding: 5px 0;
+}
+
+.closeDrawer {
+  cursor: pointer;
+}
+
+.closeDrawer svg {
+  height: 30px;
+  stroke: currentColor;
+  width: 30px;
+}
+
+.emptyCart {
+  padding: 30px;
+}
+
+.blocksList {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.blockItem {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.blockItem a {
+  display: block;
+  padding-bottom: 150%;
+  position: relative;
+}
+
+.blockItem a::before {
+  content: attr(data-before);
+  text-align: center;
+  background: #F5F4F1;
+  width: 90%;
+  margin: auto;
+  padding: 5px;
+  display: block;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translate(-50%);
+}
+
+.cartDrawerForm {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.cc-animate-enabled .cartDrawerForm {
+  opacity: 1;
+}
+
+.cartDrawerForm>.drawer-cart-list {
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.cartDrawerForm>* {
+  padding: 30px;
+}
+
+.cartDrawerForm .drawer-cart-list .drawer-cart-item {
+  display: flex;
+  margin: 0;
+}
+
+.cartDrawerForm .drawer-cart-list .drawer-cart-item+.drawer-cart-item {
+  margin-top: 1em;
+}
+
+.cartDrawerForm .drawer-cart-list-left {
+  flex: 1 1 120px;
+}
+
+.cartDrawerForm .drawer-cart-list-left .col-image {
+  margin: 0;
+  width: 100px;
+}
+
+.cartDrawerForm .drawer-cart-list-right {
+  flex: 1 1 calc(100% - 120px);
+}
+
+.cartDrawerForm .drawer-cart-list-right .col-notimage {
+  align-items: flex-end;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.cartDrawerForm .drawer-cart-list .desc {
+  margin: 0;
+  margin-bottom: auto;
+  width: 100%;
+}
+
+.cartDrawerForm .drawer-cart-list .quantity-and-remove {
+  margin: 0;
+}
+
+.cartDrawerForm .drawer-cart-list .quantity,
+.cartDrawerForm .drawer-cart-list .quantity input {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.cartDrawerForm .drawer-cart-list .quantity {
+  align-items: center;
+  display: flex;
+  justify-content: space-around;
+  padding: 0;
+}
+
+.cartDrawerForm .drawer-cart-list .quantity .quantityContole {
+  cursor: pointer;
+  padding: 0.5em 1em;
+}
+
+.cartDrawerForm .drawer-cart-list .line-total {
+  padding-bottom: 1em;
+}
+
+.cartDrawerForm .under-cart-footer {
+  border-top: 1px solid #e8e8e1;
+}
+
+.cartDrawerForm .under-cart-footer .cart-discount,
+.cartDrawerForm .under-cart-footer .subtotal {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.cartDrawerForm .under-cart-footer .button.button--checkout {
+  display: block;
+  width: 100%;
+}
+
+.drawerSliderHeading {
+  padding: 0 15px;
+  position: relative;
+  text-align: center;
+}
+
+.drawerSliderHeading::before {
+  background-color: #000;
+  content: '';
+  height: 1px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 30px);
+  z-index: 1;
+}
+
+.drawerSliderHeading>span {
+  background-color: #F5F4F1;
+  padding: 0 1em;
+  position: relative;
+  z-index: 2;
+}
+
+.drawerSlider {
+  padding: 15px;
+}
+
+.drawerSliderItem {
+  font-size: 0.7em;
+  line-height: 1.3;
+  padding: 15px;
+  text-align: center;
+}
+
+.drawerSliderTitle {
+  font-weight: bold;
+  padding: 1em 0;
+}
+
+.drawerSlider .slickArrow {
+  position: absolute;
+  top: 38%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.drawerSlider .slickArrowLeft {
+  left: -0.5em;
+}
+
+.drawerSlider .slickArrowRight {
+  right: -0.5em;
+}
+
+.drawerBody .show_payment_icons {
+  display: flex;
+  gap: 0.5em;
+  justify-content: center;
+  margin-top: 1em;
+}
+
+.drawerBody .show_payment_icon {
+  height: 2em;
+  width: 2em;
+}
+
+.drawerBody h2 {
+  font-size: var(--harderSize-size);
+  font-family: Playfair Display, serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@media only screen and (max-width: 767px) {
+  #drawercartform .drawer-cart-list-right .col-notimage {
+    display: flex;
+  }
+
+  #drawercartform .drawer-cart-list .quantity-and-remove,
+  #drawercartform .drawer-cart-list .line-total {
+    display: block;
+    flex: 0 0 50%;
+    width: 50%;
+  }
+
+  #drawercartform .drawer-cart-list .quantity {
+    padding: 0;
+    width: 100%;
+  }
+
+  #drawercartform .drawer-cart-list .quantity .minus,
+  #drawercartform .drawer-cart-list .quantity .plus {
+    width: 25%;
+  }
+
+  #drawercartform .drawer-cart-list .quantity input {
+    display: block;
+    margin: auto;
+    width: 50%;
+  }
+
+  #drawercartform .drawer-cart-list .line-total {
+    padding-bottom: 0.4em;
+  }
+}

@@ -1,0 +1,541 @@
+{% liquid
+  assign harderFont = section.settings.harderFont
+  assign shippingFont = section.settings.shippingFont
+  assign productFont = section.settings.productFont
+  assign productTotalFont = section.settings.productTotalFont
+  assign subtotelLabelFont = section.settings.subtotelLabelFont
+  assign subtotelFont = section.settings.subtotelFont
+  assign cartFont = section.settings.cartFont
+  assign emptyFont = section.settings.emptyFont
+  assign linkFont = section.settings.linkFont
+  assign collectionFont = section.settings.collectionFont
+  assign total = cart.total_price | times: 1
+
+  assign insuranceChecked = ''
+  assign insurances = shop.metaobjects.insurance.values | reverse
+
+  assign gift_notes = shop.metaobjects.gift_note.values
+  assign gift_note_checked = ''
+  assign gift_note = ''
+  assign gift_note_id = ''
+  for gift_note in gift_notes
+    for gift_note_variant in gift_note.product.value
+      assign gift_note_id = gift_note_variant.id
+    endfor
+  endfor
+%}
+
+{% style %}
+  echo harderFont | font_face
+  echo shippingFont | font_face
+  echo productFont | font_face
+  echo productTotalFont | font_face
+  echo subtotelLabelFont | font_face
+  echo subtotelFont | font_face
+  echo cartFont | font_face
+  echo emptyFont | font_face
+  echo linkFont | font_face
+  echo collectionFont | font_face
+{% endstyle %}
+
+<cart-drawer class="cartDrawer" style='
+  --background-color: {{ section.settings.backgroundColor }};
+  --theme-color: {{ section.settings.themeColor }};
+  --text-color: {{ section.settings.textColor }};
+  --harderfont-family: {{ harderFont.family }}, {{ harderFont.fallback_families }};
+  --harderSize-size: {{ section.settings.harderSize }}px;
+  --harderfont-style: {{ harderFont.style }};
+  --harderfont-weight: {{ harderFont.weight }};
+
+  --shippingfont-family: {{ shippingFont.family }}, {{ shippingFont.fallback_families }};
+  --shippingSize-size: {{ section.settings.shippingSize }}px;
+  --shippingfont-style: {{ shippingFont.style }};
+  --shippingfont-weight: {{ shippingFont.weight }};
+
+  --productfont-family: {{ productFont.family }}, {{ productFont.fallback_families }};
+  --productSize-size: {{ section.settings.productSize }}px;
+  --productfont-style: {{ productFont.style }};
+  --productfont-weight: {{ productFont.weight }};
+
+  --producttotalfont-family: {{ productTotalFont.family }}, {{ productTotalFont.fallback_families }};
+  --productTotalSize-size: {{ section.settings.productTotalSize }}px;
+  --producttotalfont-style: {{ productTotalFont.style }};
+  --producttotalfont-weight: {{ productTotalFont.weight }};
+
+  --subtotellabelfont-family: {{ subtotelLabelFont.family }}, {{ subtotelLabelFont.fallback_families }};
+  --subtotelLabelSize-size: {{ section.settings.subtotelLabelSize }}px;
+  --subtotellabelfont-style: {{ subtotelLabelFont.style }};
+  --subtotellabelfont-weight: {{ subtotelLabelFont.weight }};
+
+  --subtotelfont-family: {{ subtotelFont.family }}, {{ subtotelFont.fallback_families }};
+  --subtotelSize-size: {{ section.settings.subtotelSize }}px;
+  --subtotelfont-style: {{ subtotelFont.style }};
+  --subtotelfont-weight: {{ subtotelFont.weight }};
+
+  --cartfont-family: {{ cartFont.family }}, {{ cartFont.fallback_families }};
+  --cartSize-size: {{ section.settings.cartSize }}px;
+  --cartfont-style: {{ cartFont.style }};
+  --cartfont-weight: {{ cartFont.weight }};
+
+  --emptyfont-family: {{ emptyFont.family }}, {{ emptyFont.fallback_families }};
+  --emptySize-size: {{ section.settings.emptySize }}px;
+  --emptyfont-style: {{ emptyFont.style }};
+  --emptyfont-weight: {{ emptyFont.weight }};
+
+  --linkfont-family: {{ linkFont.family }}, {{ linkFont.fallback_families }};
+  --linkSize-size: {{ section.settings.linkSize }}px;
+  --linkfont-style: {{ linkFont.style }};
+  --linkfont-weight: {{ linkFont.weight }};
+
+  --collectionFont-family: {{ collectionFont.family }}, {{ collectionFont.fallback_families }};
+  --collectionSize-size: {{ section.settings.collectionSize }}px;
+  --collectionFont-style: {{ collectionFont.style }};
+  --collectionFont-weight: {{ collectionFont.weight }};
+  '>
+  <div class="drawerContainer">
+    <div class="drawerWrapper">
+      <div class="drawerBody">
+
+        <h2 class="h2">Cart <span class="closeDrawer"><svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-close" viewBox="0 0 64 64"><path d="M19 17.61l27.12 27.13m0-27.12L19 44.74"></path></svg></span></h1>
+  
+        {% if total < 20000 %}
+          <div class="shippingbar">
+            {% assign remaining = 20000 | minus: total | money_without_trailing_zeros %}
+            {{ section.settings.shippingbar | replace: '$', remaining }}
+          </div>
+        {% else %}
+          <div class="shippingbar">
+            {{ section.settings.over }}
+          </div>
+        {% endif %}
+  
+        {% if cart.item_count > 0 %}
+          <form action="{{ routes.cart_url }}" method="post" class="cartDrawerForm" data-cc-animate>
+            <ul class="drawer-cart-list cart-list clearfix">
+              {% for item in cart.items %}
+                <li class="drawer-cart-item item clearfix" data-id="{{ item.id }}" data-handle="{{ item.handle }}">
+                  {% liquid
+                    if item.id == gift_note_id
+                      assign gift_note_checked = ' checked'
+                      assign gift_note = cart.attributes["Gift Note"]
+                    endif
+
+                    if forloop.index == 1
+                      assign cat = item.product.collections | last
+                    endif
+                  %}
+                  <div class="drawer-cart-list-left">
+                    <div class="col-image">
+                      <a data-cc-animate-click class="image" href="{{ item.url }}">
+                        {{ item.image | img_url: "100x100" | img_tag }}
+                      </a>
+                    </div>
+                  </div>
+                  <div class="drawer-cart-list-right">
+                    <div class="col-notimage">
+                      <div class="desc">
+                        {% if settings.show_preorder_label and item.product.template_suffix == 'preorder' %}
+                          <div class="feature-subheader feature-subheader--small">{{ 'products.product.preorder' | t }}</div>
+                        {% endif %}
+                        <div class="title">
+                          <a data-cc-animate-click href="{{ item.url }}">
+                            <span class="product-title">{{ item.product.title }}</span>
+                          </a>
+                        </div>
+                        {% for dv in item.options_with_values %}
+                          {% if dv.value != "Default Title" %}
+                            <div class="line-items" style="margin: 0">
+                              <p style="margin: 0"><strong>{{ dv.name }}: </strong>{{ dv.value }}</p>
+                            </div>
+                          {% endif %}
+                        {% endfor %}
+                        {% if item.properties.size > 0 %}
+                          <div class="line-items">
+                            {% for p in item.properties %}
+                              {% unless p.last == blank %}
+                                {% unless p.first contains "_is_preorder" %}
+                                  {{ p.first }}:
+                                {% endunless %}
+        
+                                {% if p.last contains '/uploads/' %}
+                                  <a data-cc-animate-click href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+                                  {% else %}
+                                  {{ p.last }}
+                                {% endif %}
+                                <br/>
+                              {% endunless %}
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+        
+                        {% if item.selling_plan_allocation %}
+                          <div class="subscription-description">
+                            <p>{{ item.selling_plan_allocation.selling_plan.name }}</p>
+                          </div>
+                        {% endif %}
+                      </div>
+        
+                      <div class="quantity-and-remove">
+                        <div class="quantity border-radius-{{ settings.buttons_shape }}">
+                          <span class="quantityContole quantityMinus"><span>&minus;</span></span>
+                          <input class="select-on-focus" type="text" size="2" data-id="{{ item.id }}" name="updates[]" value="{{ item.quantity }}"/>
+                          <span class="quantityContole quantityPlus"><span>&plus;</span></span>
+                        </div>
+                      </div>
+        
+                      <div class="line-total">
+                        {% if item.original_line_price != item.final_line_price %}
+                          <div class="original-price theme-money">{%- render "price", price: item.original_line_price, disable_currency_code: true -%}</div>
+                          <div class="theme-money">{%- render "price", price: item.final_line_price, disable_currency_code: true -%}</div>
+                          {% else %}
+                          <div class="theme-money">{%- render "price", price: item.final_line_price, disable_currency_code: true -%}</div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </li>
+
+                {%- liquid
+                  for insurance in insurances
+                    if insurance.variant.value.id == item.id
+                      assign insuranceChecked = ' checked'
+                    endif
+                  endfor
+                -%}
+              {% endfor %}
+            </ul>
+  
+            <div class="under-cart-footer">
+              <div class="subtotal-row">
+                {%- if cart.cart_level_discount_applications != blank -%}
+                  <ul class="cart-discount-list align-right">
+                    {%- for discount_application in cart.cart_level_discount_applications -%}
+                      <li class="cart-discount cart-discount--inline">
+                        <span class="cart-discount__label">{{ discount_application.title }}</span>
+                        <span class="cart-discount__amount">-<span class="theme-money">{%- render "price", price: discount_application.total_allocated_amount, disable_currency_code: true -%}</span></span>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+      
+                <div class="subtotal">
+                  <span class="label">{{ 'cart.general.subtotal' | t }}</span>
+                  <span class="amount theme-money">{%- render "price", price: cart.total_price, is_total_price: true -%}</span>
+                </div>
+              </div>
+              {% if settings.cart_insurance_show and insurances %}
+                <p class="terms rte" data-merge="insurance">
+                  {%- liquid
+                    for insurance in insurances
+                      assign threshold_min = insurance.threshold_min | times: 100
+                      assign threshold_max = insurance.threshold_max | times: 100
+
+                      if threshold_max < threshold_min and cart.total_price > threshold_min
+                        assign pp_id = insurance.variant.value.id
+                        assign pp_price = insurance.variant.value.price
+                      else
+                        if cart.total_price > threshold_min and cart.total_price < threshold_max
+                          assign pp_id = insurance.variant.value.id
+                          assign pp_price = insurance.variant.value.price
+                        endif
+                      endif
+                    endfor
+                  -%}
+
+                  <input type="checkbox" class="parcel-insurance" data-id="{{ pp_id }}"{{ insuranceChecked }}/>
+                  <span>Add Parcel Protection while it's in transit for</span> &nbsp; {%- render "price", price: pp_price -%}. <a href="{{ settings.cart_insurance_link }}">{{ settings.cart_insurance_link_text }}</a>
+                </p>
+              {% endif %}
+
+              {% if gift_note_id != blank %}
+                <p class="terms rte" data-merge="gift_note">
+                  <label class="gift_note_label" for="gift_note_input">
+                    <input type="checkbox" id="gift_note_input" class="gift_note_input" data-id="{{ gift_note_id }}"{{ gift_note_checked }} />
+                    <span>Is this a gift? Add a personalised note to your order for $3.00</span>
+                  </label>
+                  <textarea class="gift_note" name="attributes[Gift Note]" placeholder="Add a personalised note to your order.">{{ gift_note }}</textarea>
+                </p>
+              {% endif %}
+              {% comment %} <textarea class="drawerNote" name="note" placeholder="Is this a gift? Add a personalised note to your order.">{{ cart.note }}</textarea> {% endcomment %}
+              <input type="hidden" name="return_to" value="/checkout/" />
+              <div id="doddle-collect-none-plus"></div>
+              {% if settings.cart_insurance_show and insurances %}
+                <button type="submit" name="checkout" class="button check-insurance">{{ 'products.product.popup_checkout' | t }} - <span class="cartItemSubtotal">{{ cart.total_price | money }}</span></button>
+              {% endif %}
+              <button type="submit" name="checkout" class="button button--checkout">{{ 'products.product.popup_checkout' | t }} - <span class="cartItemSubtotal">{{ cart.total_price | money }}</span></button>
+  
+              <div class="show_payment_icons">
+                {% for type in shop.enabled_payment_types %}
+                  {{ type | payment_type_svg_tag: class: 'show_payment_icon' }}
+                {% endfor %}
+              </div>
+            </div>
+          </form>
+        {% else %}
+          <div class="emptyCart">
+            <div class="rte">
+              <p class="emptyCartHeading">{{ 'cart.general.empty' | t }}</p>
+              <p class="emptyCartLink"><a data-cc-animate-click href="{{ section.settings.link }}">{{ 'cart.general.continue_browsing' | t }}</a></p>
+  
+              {% if section.blocks.size > 0 %}
+              <div class="blocksList">
+                {% for block in section.blocks %}
+                  <div class="blockItem" style="background-image: url({{ block.settings.image | img_url: "master" }})">
+                    {% assign collectionArray = collections[block.settings.collection] %}
+                    <a href="{{ collectionArray.url }}" data-before="{{ collectionArray.title }}"></a>
+                  </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</cart-drawer>
+
+<script>
+  (function() {
+    document.addEventListener('shopify:section:select', (event) => {
+      if(event.detail.sectionId == "{{ section.id }}") {
+        document.querySelector('cart-drawer').show();
+      }
+    });
+    document.addEventListener('shopify:section:deselect', (event) => {
+      if(event.detail.sectionId == "{{ section.id }}") {
+        document.querySelector('cart-drawer').close();
+      }
+    });
+  })()
+</script>
+
+{% schema %}
+{
+  "blocks":[
+    {
+      "type": "Collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "id": "image",
+          "label": "Image",
+          "type": "image_picker"
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "collection"
+        }
+      ]
+    }
+  ],
+  "name": "Drawer",
+  "settings": [
+    {
+      "default": 200,
+      "id": "freeShippingAmount",
+      "info": "The amount will replace with $",
+      "label": "free Shipping Amount",
+      "type": "number"
+    },
+    {
+      "default": "You are $ away from free shipping",
+      "id": "shippingbar",
+      "info": "$ will replace with remaing price",
+      "label": "Shipping Bar",
+      "type": "text"
+    },
+    {
+      "default": "You qualify for free shipping",
+      "id": "over",
+      "label": "Over from free shipping",
+      "type": "text"
+    },
+    {
+      "default": "/collections/all",
+      "id": "link",
+      "label": "Continue browsing link",
+      "type": "url"
+    },
+    {
+      "default": "Styles We Think You'd Love",
+      "id": "collectionHeading",
+      "label": "Slider Heading",
+      "type": "text"
+    },
+    {
+      "content": "style",
+      "type": "header"
+    },
+    {
+      "default": "#F3F3F3",
+      "id": "backgroundColor",
+      "label": "Background Color",
+      "type": "color"
+    },
+    {
+      "default": "#a7a396",
+      "id": "themeColor",
+      "label": "Theme Color",
+      "type": "color"
+    },
+    {
+      "default": "#F3F3F3",
+      "id": "textColor",
+      "label": "Text Color",
+      "type": "color"
+    },
+    {
+      "default": "avenir_next_n4",
+      "id": "harderFont",
+      "label": "Harder font",
+      "type": "font_picker"
+    },
+    {
+      "default": 26,
+      "id": "harderSize",
+      "label": "Harder size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "type": "range"
+    },
+    {
+      "default": "avenir_next_n4",
+      "id": "shippingFont",
+      "label": "Shipping font",
+      "type": "font_picker"
+    },
+    {
+      "default": 16,
+      "id": "shippingSize",
+      "label": "Shipping size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "type": "range"
+    },
+    {
+      "default": "avenir_next_n4",
+      "id": "productFont",
+      "label": "Product title font",
+      "type": "font_picker"
+    },
+    {
+      "default": 15,
+      "id": "productSize",
+      "label": "Product title size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "type": "range"
+    },
+    {
+      "default": "avenir_next_n4",
+      "id": "productTotalFont",
+      "label": "Product totel font",
+      "type": "font_picker"
+    },
+    {
+      "default": 15,
+      "id": "productTotalSize",
+      "label": "Product totel size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "type": "range"
+    },
+    {
+      "default": "avenir_next_n4",
+      "id": "subtotelLabelFont",
+      "label": "Subtotle label font",
+      "type": "font_picker"
+    },
+    {
+      "default": 15,
+      "id": "subtotelLabelSize",
+      "label": "Subtotle label size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "type": "range"
+    },
+    {
+      "default": "avenir_next_n4",
+      "id": "subtotelFont",
+      "label": "Subtotle font",
+      "type": "font_picker"
+    },
+    {
+      "default": 15,
+      "id": "subtotelSize",
+      "label": "Subtotle size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "type": "range"
+    },
+    {
+      "default": "avenir_next_n4",
+      "id": "cartFont",
+      "label": "button font",
+      "type": "font_picker"
+    },
+    {
+      "default": 13,
+      "id": "cartSize",
+      "label": "button size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "type": "range"
+    },
+    {
+      "default": "avenir_next_n4",
+      "id": "emptyFont",
+      "label": "Empty cart title font",
+      "type": "font_picker"
+    },
+    {
+      "default": 13,
+      "id": "emptySize",
+      "label": "Empty cart title size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "type": "range"
+    },
+    {
+      "default": "avenir_next_n4",
+      "id": "linkFont",
+      "label": "Continue link font",
+      "type": "font_picker"
+    },
+    {
+      "default": 13,
+      "id": "linkSize",
+      "label": "Continue link size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "type": "range"
+    },
+    {
+      "default": "avenir_next_n4",
+      "id": "collectionFont",
+      "label": "Collection font",
+      "type": "font_picker"
+    },
+    {
+      "default": 13,
+      "id": "collectionSize",
+      "label": "Collection size",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "type": "range"
+    }
+  ]
+}
+{% endschema %}
